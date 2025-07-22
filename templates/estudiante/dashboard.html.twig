@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panel Estudiante{% endblock %}
+
+{% block body %}
+<h1>Bienvenido Estudiante</h1>
+<p>Esta es tu información personal y cursos asignados.</p>
+<a href="{{ path('logout') }}">Cerrar sesión</a>
+{% endblock %}

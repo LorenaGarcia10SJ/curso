@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panel Admin{% endblock %}
+
+{% block body %}
+<div class="admin-container">
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <a href="{{ path('admin_dashboard', {'seccion': 'agregar'}) }}">Agregar Curso</a>
+        <a href="{{ path('admin_dashboard', {'seccion': 'listar'}) }}">Eliminar/Modificar Curso</a>
+        <a href="{{ path('admin_dashboard', {'seccion': 'estudiantes'}) }}">Ver Estudiantes</a>
+        <a href="{{ path('logout') }}">Cerrar Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Bienvenido Admin</h1>
+
+        {% for mensaje in app.flashes('success') %}
+            <div class="success-message">{{ mensaje }}</div>
+        {% endfor %}
+        {% for mensaje in app.flashes('error') %}
+            <div class="error-message">{{ mensaje }}</div>
+        {% endfor %}
+
+        {% if seccion == 'agregar' %}
+            <h2>Crear nuevo curso</h2>
+            <form method="POST" action="{{ path('admin_dashboard', {'seccion': 'agregar'}) }}">
+                <input type="text" name="nombre_curso" placeholder="Nombre del curso" required class="form-input">
+                <input type="text" name="descripcion" placeholder="Descripción del curso" required class="form-input">
+                <button type="submit" class="submit-button">Crear</button>
+            </form>
+
+        {% elseif seccion == 'listar' %}
+            <h2>Lista de cursos</h2>
+            <table class="course-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for curso in cursos %}
+                        <tr>
+                            <td>{{ curso.nombre }}</td>
+                            <td>{{ curso.descripcion }}</td>
+                            <td>
+                                <form method="POST" action="{{ path('eliminar_curso') }}" onsubmit="return confirm('¿Seguro que deseas eliminar este curso?');">
+                                    <input type="hidden" name="curso_id" value="{{ curso.idCurso }}">
+                                    <button type="submit" class="delete-button">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No hay cursos registrados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% elseif seccion == 'estudiantes' %}
+            <h2>Estudiantes Registrados</h2>
+            <p>Aquí iría la lista de estudiantes. (Por implementar)</p>
+
+        {% else %}
+            <p>Seleccione una opción del menú.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
