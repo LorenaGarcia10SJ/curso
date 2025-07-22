@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Asignacion
  *
  * @ORM\Table(name="asignacion", uniqueConstraints={@ORM\UniqueConstraint(name="asignacion_usuario_id_curso_id_key", columns={"usuario_id", "curso_id"})}, indexes={@ORM\Index(name="IDX_2562927187CB4A1F", columns={"curso_id"}), @ORM\Index(name="IDX_25629271DB38439E", columns={"usuario_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\AsignacionRepository")
  */
 class Asignacion
 {
@@ -38,6 +38,8 @@ class Asignacion
      * })
      */
     private $curso;
+    //private Curso $curso;
+
 
     /**
      * @var \Usuario
@@ -48,6 +50,7 @@ class Asignacion
      * })
      */
     private $usuario;
+    //private Usuario $usuario;
 
     public function getId(): ?int
     {

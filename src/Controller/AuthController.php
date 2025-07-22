@@ -46,6 +46,7 @@ class AuthController extends AbstractController
         $session = $request->getSession();
         $session->set('usuario_id', $usuario->getIdUser());
         $session->set('rol', $usuario->getRol()->getNombre());
+        $session->set('nombre', $usuario->getNombre());
 
         if ($usuario->getRol()->getNombre() === 'admin') {
             return $this->redirectToRoute('admin_dashboard');

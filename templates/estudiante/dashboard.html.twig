@@ -1,9 +1,65 @@
+{# templates/estudiante/dashboard.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Panel Estudiante{% endblock %}
+{% block title %}Dashboard Estudiante{% endblock %}
 
 {% block body %}
-<h1>Bienvenido Estudiante</h1>
-<p>Esta es tu información personal y cursos asignados.</p>
-<a href="{{ path('logout') }}">Cerrar sesión</a>
+<div class="admin-container">
+    <div class="sidebar">
+        <h2>Estudiante</h2>
+        <a href="{{ path('estudiante_dashboard', {'seccion': 'perfil'}) }}">Perfil</a>
+        <a href="{{ path('estudiante_dashboard', {'seccion': 'asignarse'}) }}">Asignarse a Curso</a>
+        <a href="{{ path('estudiante_dashboard', {'seccion': 'asignados'}) }}">Cursos Asignados</a>
+        <a href="{{ path('logout') }}">Cerrar Sesión</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Bienvenido {{ nombre }}</h1>
+
+        {% for mensaje in app.flashes('success') %}
+            <div class="success-message">{{ mensaje }}</div>
+        {% endfor %}
+        {% for mensaje in app.flashes('error') %}
+            <div class="error-message">{{ mensaje }}</div>
+        {% endfor %}
+
+        {% if seccion == 'perfil' %}
+            <h3>Tu perfil</h3>
+            <p>ID: {{ usuario_id }}</p>
+            <p>Nombre: {{ nombre }}</p>
+
+        {% elseif seccion == 'asignarse' %}
+            <h3>Asignarte a un curso</h3>
+            {% if cursos is not empty %}
+                <form method="post" action="{{ path('asignar_curso_estudiante') }}">
+                    <input type="hidden" name="usuario_id" value="{{ usuario_id }}">
+                    <select name="curso_id" required>
+                        <option value="">Seleccione un curso</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.idCurso }}">{{ curso.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Asignar</button>
+                </form>
+            {% else %}
+                <p>No hay cursos disponibles para asignarte.</p>
+            {% endif %}
+
+        {% elseif seccion == 'asignados' %}
+            <h3>Tus cursos asignados</h3>
+            {% if asignaciones is not empty %}
+                <ul>
+                    {% for asignacion in asignaciones %}
+                        <li>
+                            {{ asignacion.curso.nombre }} - Asignado el {{ asignacion.fechaAsignacion|date('d-m-Y H:i') }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aún no estás asignado a ningún curso.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
+

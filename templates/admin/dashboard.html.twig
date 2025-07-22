@@ -32,40 +32,67 @@
 
         {% elseif seccion == 'listar' %}
             <h2>Lista de cursos</h2>
-            <table class="course-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for curso in cursos %}
+                <table class="course-table">
+                    <thead>
                         <tr>
-                            <td>{{ curso.nombre }}</td>
-                            <td>{{ curso.descripcion }}</td>
-                            <td>
-                                <form method="POST" action="{{ path('eliminar_curso') }}" onsubmit="return confirm('¿Seguro que deseas eliminar este curso?');">
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for curso in cursos %}
+                            <tr>
+                                <td>{{ curso.nombre }}</td>
+                                <td>{{ curso.descripcion }}</td>
+                                <td>
+                                <div class="acciones">
+                                    <form method="GET" >
+                                    <button type="submit" class="edit-button">Editar</button>
+                                    </form>
+                                    <form method="POST" action="{{ path('eliminar_curso') }}" onsubmit="return confirm('¿Seguro que deseas eliminar este curso?');">
                                     <input type="hidden" name="curso_id" value="{{ curso.idCurso }}">
                                     <button type="submit" class="delete-button">Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% else %}
+                                    </form>
+                                </div>
+                                </td>
+
+
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3">No hay cursos registrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            {% elseif seccion == 'estudiantes' %}
+                <h2>Estudiantes Registrados</h2>
+                
+                <table class="student-table">
+                    <thead>
                         <tr>
-                            <td colspan="3">No hay cursos registrados.</td>
+                            <th>Estudiante</th>
+                            <th>Correo</th>
+                            <th>Curso</th>
+                            <th>Fecha Asignación</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-        {% elseif seccion == 'estudiantes' %}
-            <h2>Estudiantes Registrados</h2>
-            <p>Aquí iría la lista de estudiantes. (Por implementar)</p>
-
-        {% else %}
-            <p>Seleccione una opción del menú.</p>
+                    </thead>
+                    <tbody>
+                        {% for asignacion in asignaciones %}
+                            <tr>
+                                <td>{{ asignacion.usuario.nombre }}</td>
+                                <td>{{ asignacion.usuario.email }}</td>
+                                <td>{{ asignacion.curso }}</td>
+                                <td>{{ asignacion.fechaAsignacion|date('Y-m-d H:i') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4">No hay asignaciones registradas.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            
         {% endif %}
     </div>
 </div>

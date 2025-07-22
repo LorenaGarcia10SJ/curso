@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Curso;
+use App\Entity\Usuario;
+use App\Entity\Asignacion;
 use App\Repository\CursoRepository;
+use App\Repository\AsignacionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 class CursoController extends AbstractController
 {
@@ -17,7 +21,7 @@ class CursoController extends AbstractController
      */
     public function adminDashboard(Request $request, EntityManagerInterface $em): Response
     {
-        $seccion = $request->query->get('seccion', 'agregar'); // valor por defecto
+        $seccion = $request->query->get('seccion', 'agregar'); 
 
         if ($request->isMethod('POST') && $seccion === 'agregar') {
             $nombreCurso = $request->request->get('nombre_curso');
@@ -46,10 +50,12 @@ class CursoController extends AbstractController
         }
 
         $cursos = $em->getRepository(Curso::class)->findActivos();
+        //$asignaciones = $em->getRepository(Asignacion::class)->findAllConCursosYUsuarios();
 
         return $this->render('admin/dashboard.html.twig', [
             'seccion' => $seccion,
             'cursos' => $cursos,
+            'asignaciones' => [],
         ]);
     }
 
@@ -66,11 +72,24 @@ class CursoController extends AbstractController
             $this->addFlash('error', 'Curso no encontrado.');
         } else {
             $curso->setEstado(0); // Marcar como inactivo
-            $em->flush(); // Guardar cambios
+            $em->flush();
             $this->addFlash('success', 'Curso eliminado correctamente.');
         }
 
         return $this->redirectToRoute('admin_dashboard', ['seccion' => 'listar']);
     }
 
+
+/**
+ * @Route("/admin/verEstudiantes", name="estudiante_curso")
+ */
+public function estudianteCurso(AsignacionRepository $asignacionRepository): Response
+{
+    $asignaciones = $asignacionRepository->findAllConCursosYUsuarios();
+
+    return $this->render('admin/dashboard.html.twig', [
+        'seccion' => 'estudiantes',
+        'asignaciones' => $asignaciones,
+    ]);
+}
 }
