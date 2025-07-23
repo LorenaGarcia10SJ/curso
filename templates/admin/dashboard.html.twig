@@ -7,7 +7,7 @@
     <div class="sidebar">
         <h2>Admin</h2>
         <a href="{{ path('admin_dashboard', {'seccion': 'agregar'}) }}">Agregar Curso</a>
-        <a href="{{ path('admin_dashboard', {'seccion': 'listar'}) }}">Eliminar/Modificar Curso</a>
+        <a href="{{ path('admin_dashboard', {'seccion': 'listar'}) }}">Eliminar-Modificar</a>
         <a href="{{ path('admin_dashboard', {'seccion': 'estudiantes'}) }}">Ver Estudiantes</a>
         <a href="{{ path('logout') }}">Cerrar Sesión</a>
     </div>
@@ -24,10 +24,11 @@
 
         {% if seccion == 'agregar' %}
             <h2>Crear nuevo curso</h2>
-            <form method="POST" action="{{ path('admin_dashboard', {'seccion': 'agregar'}) }}">
-                <input type="text" name="nombre_curso" placeholder="Nombre del curso" required class="form-input">
-                <input type="text" name="descripcion" placeholder="Descripción del curso" required class="form-input">
-                <button type="submit" class="submit-button">Crear</button>
+
+            <form method="POST" action="{{ path('admin_dashboard', {'seccion': 'agregar'}) }}" class="form-general">
+                <input type="text" name="nombre_curso" placeholder="Nombre del curso" required>
+                <input type="text" name="descripcion" placeholder="Descripción del curso" required>
+                <button type="submit" class="form-submit">Crear</button>
             </form>
 
         {% elseif seccion == 'listar' %}
@@ -41,30 +42,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for curso in cursos %}
-                            <tr>
-                                <td>{{ curso.nombre }}</td>
-                                <td>{{ curso.descripcion }}</td>
-                                <td>
+                    {% for curso in cursos %}
+                        <tr>
+                            <td>{{ curso.nombre }}</td>
+                            <td>{{ curso.descripcion }}</td>
+                            <td>
                                 <div class="acciones">
-                                    <form method="GET" >
-                                    <button type="submit" class="edit-button">Editar</button>
-                                    </form>
+                                    <button type="button" class="edit-button" onclick="mostrarFormularioEditar({{ curso.idCurso }})">Editar</button>
                                     <form method="POST" action="{{ path('eliminar_curso') }}" onsubmit="return confirm('¿Seguro que deseas eliminar este curso?');">
-                                    <input type="hidden" name="curso_id" value="{{ curso.idCurso }}">
-                                    <button type="submit" class="delete-button">Eliminar</button>
+                                        <input type="hidden" name="curso_id" value="{{ curso.idCurso }}">
+                                        <button type="submit" class="delete-button">Eliminar</button>
                                     </form>
                                 </div>
-                                </td>
 
+                                <!-- Formulario oculto para editar -->
+                                <form id="form-editar-{{ curso.idCurso }}" class="form-editar"  method="POST"  action="{{ path('admin_dashboard', {'seccion': 'listar'}) }}"  onsubmit="return confirmarEdicion();"  style="display: none; margin-top: 10px;">
 
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="3">No hay cursos registrados.</td>
-                            </tr>
-                        {% endfor %}
+                                    <input type="hidden" name="editar_curso_id" value="{{ curso.idCurso }}">
+                                    <input type="text" name="nombre_editado" value="{{ curso.nombre }}" required>
+                                    <input type="text" name="descripcion_editada" value="{{ curso.descripcion }}" required>
+                                    <button type="submit" class="form-submit">Guardar cambios</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="3">No hay cursos registrados.</td></tr>
+                    {% endfor %}
                     </tbody>
+
                 </table>
 
             {% elseif seccion == 'estudiantes' %}
@@ -96,4 +101,18 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function mostrarFormularioEditar(id) {
+        document.querySelectorAll('.form-editar').forEach(f => f.style.display = 'none');
+        const form = document.getElementById('form-editar-' + id);
+        if (form) form.style.display = 'block';
+    }
+
+    function confirmarEdicion() {
+        return confirm("¿Estás seguro de que deseas guardar los cambios?");
+    }
+</script>
 {% endblock %}

@@ -21,8 +21,26 @@ class CursoController extends AbstractController
      */
     public function adminDashboard(Request $request, EntityManagerInterface $em): Response
     {
-        $seccion = $request->query->get('seccion', 'agregar'); 
+        $seccion = $request->query->get('seccion', 'agregar');
 
+        // ✔️ Procesar formulario de edición de curso
+        if ($request->isMethod('POST') && $request->request->has('editar_curso_id')) {
+            $idCurso = $request->request->get('editar_curso_id');
+            $curso = $em->getRepository(Curso::class)->find($idCurso);
+
+            if ($curso) {
+                $curso->setNombre($request->request->get('nombre_editado'));
+                $curso->setDescripcion($request->request->get('descripcion_editada'));
+                $em->flush();
+                $this->addFlash('success', 'Curso actualizado correctamente');
+            } else {
+                $this->addFlash('error', 'Curso no encontrado');
+            }
+
+            return $this->redirectToRoute('admin_dashboard', ['seccion' => 'listar']);
+        }
+
+        // ✔️ Procesar formulario de creación de curso
         if ($request->isMethod('POST') && $seccion === 'agregar') {
             $nombreCurso = $request->request->get('nombre_curso');
             $descripcion = $request->request->get('descripcion');
@@ -49,8 +67,8 @@ class CursoController extends AbstractController
             return $this->redirectToRoute('admin_dashboard', ['seccion' => 'agregar']);
         }
 
+        // ✔️ Cargar cursos activos
         $cursos = $em->getRepository(Curso::class)->findActivos();
-        //$asignaciones = $em->getRepository(Asignacion::class)->findAllConCursosYUsuarios();
 
         return $this->render('admin/dashboard.html.twig', [
             'seccion' => $seccion,
@@ -80,16 +98,17 @@ class CursoController extends AbstractController
     }
 
 
-/**
- * @Route("/admin/verEstudiantes", name="estudiante_curso")
- */
-public function estudianteCurso(AsignacionRepository $asignacionRepository): Response
-{
-    $asignaciones = $asignacionRepository->findAllConCursosYUsuarios();
 
-    return $this->render('admin/dashboard.html.twig', [
-        'seccion' => 'estudiantes',
-        'asignaciones' => $asignaciones,
-    ]);
-}
+    /**
+     * @Route("/admin/verEstudiantes", name="estudiante_curso")
+     */
+    public function estudianteCurso(AsignacionRepository $asignacionRepository): Response
+    {
+        $asignaciones = $asignacionRepository->findAllConCursosYUsuarios();
+
+        return $this->render('admin/dashboard.html.twig', [
+            'seccion' => 'estudiantes',
+            'asignaciones' => $asignaciones,
+        ]);
+    }
 }

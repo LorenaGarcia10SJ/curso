@@ -1,0 +1,32 @@
+<h2>Editar Curso</h2>
+
+<form method="POST" action="{{ path('actualizar_curso') }}" id="formEditarCurso">
+    <input type="hidden" name="curso_id" value="{{ curso.idCurso }}">
+
+    <label>Nombre del Curso</label>
+    <input type="text" name="nombre" value="{{ curso.nombre }}" required>
+
+    <label>Créditos</label>
+    <input type="number" name="creditos" value="{{ curso.creditos }}" required>
+
+    <!-- Botón que abre el modal -->
+    <button type="button" onclick="abrirModal()">Guardar</button>
+</form>
+
+<!-- Modal -->
+<div id="confirmModal" style="display:none; position:fixed; background-color: rgba(0,0,0,0.5); top:0; left:0; right:0; bottom:0; justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:10px; text-align:center;">
+    <p>¿Estás seguro de que deseas guardar los cambios?</p>
+    <button onclick="document.getElementById('formEditarCurso').submit()">Sí, guardar</button>
+    <button onclick="cerrarModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+function abrirModal() {
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function cerrarModal() {
+  document.getElementById('confirmModal').style.display = 'none';
+}
+</script>
